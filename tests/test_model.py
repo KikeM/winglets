@@ -150,7 +150,7 @@ def test_span(sections):
 
     wing.create_wing_planform()
 
-    expected = 14.04
+    expected = 28.08
 
     result = wing.span
 

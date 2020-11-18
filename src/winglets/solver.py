@@ -15,6 +15,7 @@ class SolverMode(Enum):
 class WingSolver:
 
     MAX_ITER_CL = 1000
+    TOL_CL = 1e-3
     NAME = "wing_solver"
 
     def __init__(self, model, altitude, mach, design_cl):
@@ -164,7 +165,7 @@ class WingSolver:
         _options = dict(maxiter=self.MAX_ITER_CL)
 
         # Minimize
-        sol = minimize_scalar(fun=func, options=_options)
+        sol = minimize_scalar(fun=func, tol=self.TOL_CL, options=_options)
 
         if sol.success == True:
 
