@@ -15,13 +15,13 @@ class SolverMode(Enum):
 class WingSolver:
 
     MAX_ITER_CL = 1000
-    NAME = "WingSolver"
+    NAME = "wing_solver"
 
     def __init__(self, model, altitude, mach, design_cl):
         """
         Parameters
         ----------
-        model :
+        model : Wing
         altitude :
         mach :
         design_cl :
@@ -44,13 +44,6 @@ class WingSolver:
         self.CL = None
         self.CY = None
         self.CDi = None
-
-    @property
-    def airplane(self):
-
-        wings = [self.model.planform]
-
-        return sbx.Airplane(name=self.NAME, xyz_ref=[0, 0, 0], wings=wings)
 
     def solve_alpha(self, alpha):
         """Solve aerodynamical problem for an angle of attack.
@@ -86,12 +79,14 @@ class WingSolver:
         return problem
 
     def _solve(self, value, mode=None):
-        """Create and solve VLM3 problem.
+        """Create and solve a VLM3 problem for a given angle of attack
+        or lift coefficient.
 
         Parameters
         ----------
         value : float
         mode : str
+            [SolverMode.ALPHA, SolverMode.CL]
 
         Returns
         -------
@@ -105,7 +100,7 @@ class WingSolver:
             rho = atmosphere.density(T=atmosphere.T, P=atmosphere.P)
 
             aero_problem = sbx.vlm3(
-                airplane=self.airplane,
+                airplane=self.model.airplane,
                 op_point=sbx.OperatingPoint(
                     velocity=self.velocity, alpha=value, density=rho
                 ),
