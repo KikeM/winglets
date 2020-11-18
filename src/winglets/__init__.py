@@ -1,4 +1,4 @@
-from .model import Wing
+from .model import FlyingWing
 from .solver import WingSolver
 
 from ._version import get_versions

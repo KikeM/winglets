@@ -11,10 +11,11 @@ class WingSectionParameters(Enum):
 
 class WingletParameters(Enum):
 
-    SPAN = "span"
-    CHORD_ROOT = "rootChord"
-    TAPER_RATIO = "taperRatio"
-    ANGLE_SWEEP = "sweepAngle"
-    ANGLE_CANT = "cantAngle"
-    INCIDENCE_ANGLE_ROOT = "incidenceAngleRoot"
-    INCIDENCE_ANGLE_TIP = "incidenceAngleTip"
+    SPAN = "wingletSpan"
+    CHORD_ROOT = "wingletRootChord"
+    TAPER_RATIO = "wingletTaperRatio"
+    ANGLE_SWEEP = "wingletSweepAngle"
+    ANGLE_CANT = "wingletCantAngle"
+    ANGLE_TWIST_ROOT = "wingletTwistRoot"
+    ANGLE_TWIST_TIP = "wingletTwistTip"
+    AIRFOIL = "wingletAirfoil"
