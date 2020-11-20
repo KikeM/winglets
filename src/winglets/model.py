@@ -64,7 +64,7 @@ class FlyingWing:
         furthest_section = self.__wingtip_section__
 
         # Return y-axis location
-        return furthest_section[LE_LOCATION].y
+        return 2.0 * furthest_section[LE_LOCATION].y
 
     @property
     def wing_tip_chord(self):
@@ -199,7 +199,7 @@ class FlyingWing:
         )
 
         # Slightly separete from the wing
-        _epsilon_winglet_wing = Point([0, 0, 0.00])
+        _epsilon_winglet_wing = Point([0, 0, 0.01])
 
         # Get wing tip section
         _section = self.__wingtip_section__
