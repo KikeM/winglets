@@ -90,9 +90,7 @@ def flying_wing_winglets(sections):
 class TestFlyingWing:
     def test_solver_alpha(self, flying_wing):
 
-        solver = wl.WingSolver(
-            model=flying_wing, altitude=ALTITUDE, mach=MACH, design_cl=CL
-        )
+        solver = wl.WingSolver(model=flying_wing, altitude=ALTITUDE, mach=MACH)
 
         problem = solver.solve_alpha(alpha=ALPHA)
 
@@ -110,9 +108,7 @@ class TestFlyingWing:
     @pytest.mark.skip(msg="This blocks the test suite to show the plots")
     def test_solver_draw(self, flying_wing):
 
-        solver = wl.WingSolver(
-            model=flying_wing, altitude=ALTITUDE, mach=MACH, design_cl=CL
-        )
+        solver = wl.WingSolver(model=flying_wing, altitude=ALTITUDE, mach=MACH)
 
         problem = solver.solve_alpha(alpha=5.0)
 
@@ -120,9 +116,7 @@ class TestFlyingWing:
 
     def test_solver_cl(self, flying_wing):
 
-        solver = wl.WingSolver(
-            model=flying_wing, altitude=ALTITUDE, mach=MACH, design_cl=CL
-        )
+        solver = wl.WingSolver(model=flying_wing, altitude=ALTITUDE, mach=MACH)
 
         problem = solver.solve_cl(cl=CL)
 
@@ -141,9 +135,7 @@ class TestFlyingWing:
 class TestFlyingWingWinglets:
     def test_solver_alpha(self, flying_wing_winglets):
 
-        solver = wl.WingSolver(
-            model=flying_wing_winglets, altitude=ALTITUDE, mach=MACH, design_cl=CL
-        )
+        solver = wl.WingSolver(model=flying_wing_winglets, altitude=ALTITUDE, mach=MACH)
 
         problem = solver.solve_alpha(alpha=ALPHA)
 
@@ -161,9 +153,7 @@ class TestFlyingWingWinglets:
     @pytest.mark.skip(msg="This blocks the test suite to show the plots")
     def test_solver_draw(self, flying_wing_winglets):
 
-        solver = wl.WingSolver(
-            model=flying_wing_winglets, altitude=ALTITUDE, mach=MACH, design_cl=CL
-        )
+        solver = wl.WingSolver(model=flying_wing_winglets, altitude=ALTITUDE, mach=MACH)
 
         problem = solver.solve_alpha(alpha=5.0)
 
@@ -171,9 +161,7 @@ class TestFlyingWingWinglets:
 
     def test_solver_cl(self, flying_wing_winglets):
 
-        solver = wl.WingSolver(
-            model=flying_wing_winglets, altitude=ALTITUDE, mach=MACH, design_cl=CL
-        )
+        solver = wl.WingSolver(model=flying_wing_winglets, altitude=ALTITUDE, mach=MACH)
 
         problem = solver.solve_cl(cl=CL)
 
