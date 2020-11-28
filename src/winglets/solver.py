@@ -18,7 +18,7 @@ class WingSolver:
     TOL_CL = 1e-3
     NAME = "wing_solver"
 
-    def __init__(self, model, altitude, mach, design_cl):
+    def __init__(self, model, altitude, mach):
         """
         Parameters
         ----------
@@ -32,7 +32,6 @@ class WingSolver:
         self.model = model
         self.altitude = altitude
         self.mach = mach
-        self.design_cl = design_cl
 
         # Compute velocity in m/s
         atmosphere = ATMOSPHERE_1976(altitude)

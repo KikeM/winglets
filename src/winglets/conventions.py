@@ -1,4 +1,11 @@
-from enum import Enum
+from enum import Enum, auto
+
+
+class OperationPoint(Enum):
+
+    ALTITUDE = "altitude"
+    MACH = "Mach"
+    CL = "CL"
 
 
 class WingSectionParameters(Enum):
@@ -11,11 +18,11 @@ class WingSectionParameters(Enum):
 
 class WingletParameters(Enum):
 
-    SPAN = "wingletSpan"
-    CHORD_ROOT = "wingletRootChord"
-    TAPER_RATIO = "wingletTaperRatio"
-    ANGLE_SWEEP = "wingletSweepAngle"
-    ANGLE_CANT = "wingletCantAngle"
-    ANGLE_TWIST_ROOT = "wingletTwistRoot"
-    ANGLE_TWIST_TIP = "wingletTwistTip"
+    SPAN = 0
+    CHORD_ROOT = 1
+    TAPER_RATIO = 2
+    ANGLE_SWEEP = 3
+    ANGLE_CANT = 4
+    ANGLE_TWIST_ROOT = 5
+    ANGLE_TWIST_TIP = 6
     AIRFOIL = "wingletAirfoil"

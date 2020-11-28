@@ -44,6 +44,8 @@ class FlyingWing:
         self.winglet = None
         self.winglet_dimensions = dict()
 
+        self.__winglet_created__ = False
+
     @staticmethod
     def __sort_sections__(sections):
         _sort_func = lambda section: section[LE_LOCATION].y
@@ -85,7 +87,7 @@ class FlyingWing:
 
         _wings = [self.planform]
 
-        if self.winglet_parameters is not None:
+        if self.__winglet_created__ == True:
             _wings.extend(self.winglet)
 
         return _wings
@@ -145,8 +147,16 @@ class FlyingWing:
 
         self._create_winglet()
 
+        self.__winglet_created__ = True
+
+    def remove_winglet(self):
+        """Remove winglet from flying wing."""
+
+        self.winglet = None
+        self.__winglet_created__ = False
+
     @staticmethod
-    def get_winglet_vector(length, sweep, cant):
+    def __get_winglet_vector__(length, sweep, cant):
         """
         Compute winglet tip coordinates in the winglet's
         LE frame of reference.
@@ -192,7 +202,7 @@ class FlyingWing:
         parameters = self.winglet_parameters
         dimensions = self.winglet_dimensions
 
-        location_tip = self.get_winglet_vector(
+        location_tip = self.__get_winglet_vector__(
             length=dimensions["length"],
             sweep=parameters[W_ANGLE_SWEEP],
             cant=parameters[W_ANGLE_CANT],
