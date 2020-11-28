@@ -11,12 +11,14 @@ AIRFOIL = WingSectionParameters.AIRFOIL.value
 SPAN = WingletParameters.SPAN.value
 ANGLE_CANT = WingletParameters.ANGLE_CANT.value
 ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP.value
+ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT.value
+ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP.value
 CHORD_ROOT = WingletParameters.CHORD_ROOT.value
 TAPER_RATIO = WingletParameters.TAPER_RATIO.value
 W_AIRFOIL = WingletParameters.AIRFOIL.value
 
 
-def get_base_winglet_parametrization():
+def get_base_winglet_parametrization(twist_zero=True):
 
     winglet_parameters = {
         SPAN: 0.05,
@@ -24,8 +26,14 @@ def get_base_winglet_parametrization():
         CHORD_ROOT: 0.65,
         ANGLE_SWEEP: 38,
         ANGLE_CANT: 45,
+        ANGLE_TWIST_ROOT: 0.0,
+        ANGLE_TWIST_TIP: 0.0,
         W_AIRFOIL: "naca0012",
     }
+
+    if twist_zero == False:
+        winglet_parameters[ANGLE_TWIST_ROOT] = 1.0
+        winglet_parameters[ANGLE_TWIST_TIP] = 1.0
 
     return winglet_parameters
 
@@ -57,3 +65,36 @@ def get_base_sections():
     ]
 
     return _sections
+
+
+def get_bounds():
+
+    SPAN = WingletParameters.SPAN
+    ANGLE_CANT = WingletParameters.ANGLE_CANT
+    ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP
+    ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT
+    ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP
+    TAPER_RATIO = WingletParameters.TAPER_RATIO
+    CHORD_ROOT = WingletParameters.CHORD_ROOT
+
+    _min = {
+        SPAN: 0.02,
+        ANGLE_CANT: 15,
+        ANGLE_SWEEP: 0.0,
+        ANGLE_TWIST_ROOT: -5.0,
+        ANGLE_TWIST_TIP: -5.0,
+        TAPER_RATIO: 0.3,
+        CHORD_ROOT: 0.4,
+    }
+
+    _max = {
+        SPAN: 0.1,
+        ANGLE_CANT: 85.0,
+        ANGLE_SWEEP: 50.0,
+        ANGLE_TWIST_ROOT: 5.0,
+        ANGLE_TWIST_TIP: 5.0,
+        TAPER_RATIO: 1.0,
+        CHORD_ROOT: 1.0,
+    }
+
+    return _min, _max

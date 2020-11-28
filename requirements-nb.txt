@@ -1,5 +1,5 @@
 jupyter
 matplotlib
-tqdm
-sympy
 proplot
+sympy
+tqdm

@@ -13,8 +13,29 @@ CL = OperationPoint.CL.value
 NAME_CD = "CDi"
 NAME_CM = "Cm"
 
+SPAN = WingletParameters.SPAN
+CHORD_ROOT = WingletParameters.CHORD_ROOT
+TAPER_RATIO = WingletParameters.TAPER_RATIO
+ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP
+ANGLE_CANT = WingletParameters.ANGLE_CANT
+ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT
+ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP
+
+_DESIGN_VARIABLES = [
+    SPAN,
+    CHORD_ROOT,
+    TAPER_RATIO,
+    ANGLE_SWEEP,
+    ANGLE_CANT,
+    ANGLE_TWIST_ROOT,
+    ANGLE_TWIST_TIP,
+]
+
 
 class WingletOptimizer:
+
+    MAX_ITER = 50
+
     def __init__(
         self, base, target, operation_point, initial_winglet, interpolation_factor=0.5
     ):
@@ -26,7 +47,7 @@ class WingletOptimizer:
         target : winglets.FlyingWing
         operation_point : dict
         initial_winglet : dict
-        interpolation_factor : float
+        interpolation_factor : float, default 0.5
         """
 
         # Collect design CL
@@ -40,6 +61,8 @@ class WingletOptimizer:
         self.initial_winglet = initial_winglet
 
         self.optimum = None
+        self.success = None
+        self.bounds = None
 
     def _create_solver(self, model):
         """Create solver at the operational point.
@@ -69,18 +92,35 @@ class WingletOptimizer:
         x : np.array
         """
 
-        base_parameters = list(self.initial_winglet.values())
+        new_parameters = self.__dv2param__(x)
 
-        new_parameters = self.initial_winglet.copy()
-
-        # Modify cant angle
-        ANGLE_CANT = WingletParameters.ANGLE_CANT.value
-        new_parameters[ANGLE_CANT] *= x[0]
-
-        model.winglet_parameters = new_parameters
+        model.winglet_parameters = new_parameters.copy()
 
         model.remove_winglet()
         model.create_winglet()
+
+        return new_parameters
+
+    def __dv2param__(self, x):
+        """From the design vector compute the winglet design parameters.
+
+        Parameters
+        ----------
+        x : numpy.array
+
+        Returns
+        -------
+        new_parameters : dict
+        """
+
+        new_parameters = self.initial_winglet.copy()
+
+        # Modify design variables
+        for variable in _DESIGN_VARIABLES:
+
+            _idx = variable.value
+
+            new_parameters[_idx] *= x[_idx]
 
         return new_parameters
 
@@ -150,7 +190,7 @@ class WingletOptimizer:
 
         Parameters
         ----------
-        x : np.array
+        x : numpy.array
 
         Returns
         -------
@@ -172,8 +212,60 @@ class WingletOptimizer:
 
         return results, parameters
 
-    def optimize(self):
+    def set_bounds(self, lower, upper):
+        """Create bounds for optimizer.
+
+        Parameters
+        ----------
+        lower : dict
+        upper : dict
+
+        Raises
+        ------
+        ValueError
+
+        Notes
+        -----
+        Use np.inf to define an open bound on one extrema.
+        """
+
+        low_keys = lower.keys()
+        up_keys = upper.keys()
+        assert (
+            low_keys == up_keys
+        ), f"""Some variables do not have all bounds. 
+        Lower:{low_keys}, upper: {up_keys}"""
+
+        n_bounds = len(low_keys)
+
+        _lower = np.zeros(n_bounds)
+        _upper = np.zeros(n_bounds)
+
+        for variable in low_keys:
+
+            _idx = variable.value  # It is a WingletParameter value
+
+            _initial_value = self.initial_winglet[_idx]
+
+            _lower[_idx] = lower[variable] / _initial_value
+            _upper[_idx] = upper[variable] / _initial_value
+
+        bounds = [(low, up) for low, up in zip(_lower, _upper)]
+
+        self.bounds = bounds
+
+        return bounds
+
+    def optimize(self, options=None):
         """Optimize winglet configuration.
+
+        Parameters
+        ----------
+        options : dict, optional
+            {
+                "maxiter" : int,
+                "disp" : bool
+            }
 
         Returns
         -------
@@ -184,10 +276,16 @@ class WingletOptimizer:
 
         # All but the airfoil shape are degrees of freedom
         # dofs = len(self.initial_winglet) - 1
-        dofs = 1  # Cant angle
+        dofs = len(_DESIGN_VARIABLES)  # Cant angle
         x0 = np.ones(shape=dofs)
 
-        optimum = minimize(fun=func, x0=x0, bounds=[(0.01, 1.8)])
+        # Create default options
+        if options is None:
+            options = dict(maxiter=self.MAX_ITER)
+
+        optimum = minimize(fun=func, x0=x0, bounds=self.bounds, options=options)
+
+        self.success = optimum.success
 
         self.optimum = optimum
 

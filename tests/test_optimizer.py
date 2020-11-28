@@ -19,6 +19,15 @@ LE_LOCATION = WingSectionParameters.LE_LOCATION.value
 TWIST = WingSectionParameters.TWIST.value
 AIRFOIL = WingSectionParameters.AIRFOIL.value
 
+SPAN = WingletParameters.SPAN.value
+ANGLE_CANT = WingletParameters.ANGLE_CANT.value
+ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP.value
+ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT.value
+ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP.value
+TAPER_RATIO = WingletParameters.TAPER_RATIO.value
+CHORD_ROOT = WingletParameters.CHORD_ROOT.value
+W_AIRFOIL = WingletParameters.AIRFOIL.value
+
 
 @pytest.fixture
 def operation_point():
@@ -76,19 +85,14 @@ def flying_wing(sections):
 def flying_wing_winglets(sections):
     """Flying wing with winglets."""
 
-    SPAN = WingletParameters.SPAN.value
-    ANGLE_CANT = WingletParameters.ANGLE_CANT.value
-    ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP.value
-    CHORD_ROOT = WingletParameters.CHORD_ROOT.value
-    TAPER_RATIO = WingletParameters.TAPER_RATIO.value
-    W_AIRFOIL = WingletParameters.AIRFOIL.value
-
     winglet_parameters = {
         SPAN: 0.05,
         TAPER_RATIO: 0.32,
         CHORD_ROOT: 0.65,
         ANGLE_SWEEP: 38,
         ANGLE_CANT: 45,
+        ANGLE_TWIST_ROOT: 1.0,
+        ANGLE_TWIST_TIP: 1.0,
         W_AIRFOIL: "naca0012",
     }
 
@@ -100,6 +104,40 @@ def flying_wing_winglets(sections):
     return _wing
 
 
+@pytest.fixture
+def bounds():
+
+    SPAN = WingletParameters.SPAN
+    ANGLE_CANT = WingletParameters.ANGLE_CANT
+    ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP
+    ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT
+    ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP
+    TAPER_RATIO = WingletParameters.TAPER_RATIO
+    CHORD_ROOT = WingletParameters.CHORD_ROOT
+
+    _min = {
+        SPAN: 0.02,
+        ANGLE_CANT: 15,
+        ANGLE_SWEEP: 0.0,
+        ANGLE_TWIST_ROOT: -5.0,
+        ANGLE_TWIST_TIP: -5.0,
+        TAPER_RATIO: 0.3,
+        CHORD_ROOT: 0.4,
+    }
+
+    _max = {
+        SPAN: 0.1,
+        ANGLE_CANT: 85,
+        ANGLE_SWEEP: 50.0,
+        ANGLE_TWIST_ROOT: 5.0,
+        ANGLE_TWIST_TIP: 5.0,
+        TAPER_RATIO: 1.0,
+        CHORD_ROOT: 1.0,
+    }
+
+    return _min, _max
+
+
 @pytest.fixture(scope="function")
 def optimizer(operation_point, flying_wing, flying_wing_winglets):
 
@@ -107,7 +145,7 @@ def optimizer(operation_point, flying_wing, flying_wing_winglets):
         base=flying_wing,
         target=flying_wing_winglets,
         operation_point=operation_point,
-        initial_winglet=get_base_winglet_parametrization(),
+        initial_winglet=get_base_winglet_parametrization(twist_zero=False),
     )
 
     return _optimizer
@@ -124,24 +162,40 @@ class TestOptimizer:
 
         assert expected == results
 
-    def test_optimization_cant_angle(self, optimizer):
+    def test_set_bounds(self, optimizer, bounds):
 
-        optimizer.interpolation_factor = 0.55555556
+        # Unpack data
+        _min, _max = bounds
 
-        optimizer.put_up()
-        result = optimizer.optimize()
+        optimizer.set_bounds(lower=_min, upper=_max)
 
-        expected_cant_angle = 38.4241091
-
-        result_cant_angle = (
-            result.x * optimizer.initial_winglet[WingletParameters.ANGLE_CANT.value]
-        )
-
-        assert_allclose(
-            desired=expected_cant_angle, actual=result_cant_angle, rtol=1e-3
-        )
+        result_bounds = optimizer.bounds
 
         pass
+
+    @pytest.mark.slow
+    def test_global_optimization(self, optimizer, bounds):
+
+        optimizer.interpolation_factor = 0.5
+
+        optimizer.put_up()
+
+        _lower, _upper = bounds
+        optimizer.set_bounds(lower=_lower, upper=_upper)
+
+        result = optimizer.optimize()
+
+        # Asserts
+        expected_x = np.array(
+            [2.0, 1.53846154, 0.9375, 0.0, 0.33333333, 2.20818463, 2.77646728]
+        )
+
+        result_x = result.x
+        assert_allclose(desired=expected_x, actual=result_x)
+
+        expected_J = 0.9259397252972542
+        result_J = result.J
+        assert np.isclose(expected_J, result_J)
 
     def test_evaluate_optimal_point(self, optimizer):
 
@@ -155,38 +209,24 @@ class TestOptimizer:
             njev=5,
             status=0,
             success=True,
-            x=np.array([0.85397381]),
+            x=np.array([1, 1, 1, 1, 0.85397381, 1, 1]),
         )
 
         optimizer.optimum = result
 
         targets, parameters = optimizer.evaluate_optimum()
 
-        expected_targets = {"CDi": 0.005316969443946267, "Cm": -51.91339550388924}
+        expected_targets = {"CDi": 0.005318006823391808, "Cm": -51.93177989903035}
         expected_parameters = {
             0: 0.05,
             2: 0.32,
             1: 0.65,
             3: 38,
             4: 38.42882145,
+            5: 1.0,
+            6: 1.0,
             "wingletAirfoil": "naca0012",
         }
 
         assert expected_parameters == parameters
         assert expected_targets == targets
-
-    def test_evaluate_optimal_point_raise(self, optimizer):
-
-        try:
-            targets, parameters = optimizer.evaluate_optimum()
-        except ValueError as error:
-            message = error.args[0]
-
-        expected_message = "You must call the `optimize` method before evaluation."
-
-        assert expected_message == message
-
-    @pytest.mark.skip(msg="Not implemented yet.")
-    def test_global_optimization(self, optimizer):
-
-        pass

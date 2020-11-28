@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": "/opt/anaconda3/envs/winglets/bin/python"
+    "python.pythonPath": "/opt/anaconda3/envs/winglets/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
 }
