@@ -13,6 +13,8 @@ AIRFOIL = WingSectionParameters.AIRFOIL.value
 W_SPAN = WingletParameters.SPAN.value
 W_ANGLE_CANT = WingletParameters.ANGLE_CANT.value
 W_ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP.value
+W_ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT.value
+W_ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP.value
 W_CHORD_ROOT = WingletParameters.CHORD_ROOT.value
 W_TAPER_RATIO = WingletParameters.TAPER_RATIO.value
 W_AIRFOIL = WingletParameters.AIRFOIL.value
@@ -157,15 +159,13 @@ class FlyingWing:
 
     @staticmethod
     def __get_winglet_vector__(length, sweep, cant):
-        """
-        Compute winglet tip coordinates in the winglet's
-        LE frame of reference.
+        """Compute winglet tip coordinates in the winglet's LE frame of reference.
 
         Parameters
         ----------
-        length: float
-        sweep: float, degrees
-        cant: float, degrees
+        length : float
+        sweep : float, degrees
+        cant : float, degrees
 
         Returns
         -------
@@ -191,7 +191,7 @@ class FlyingWing:
         return vector
 
     def _create_winglet(self):
-        """Generate winglet.
+        """Create winglet.
 
         Returns
         -------
@@ -224,6 +224,9 @@ class FlyingWing:
 
         winglet_airfoil = sbx.Airfoil(name=parameters[W_AIRFOIL])
 
+        twist_root = parameters[W_ANGLE_TWIST_ROOT]
+        twist_tip = parameters[W_ANGLE_TWIST_TIP]
+
         winglet = sbx.Wing(
             name="Winglet",
             xyz_le=list(coordinates_weld),
@@ -232,13 +235,13 @@ class FlyingWing:
                 sbx.WingXSec(
                     xyz_le=[0, 0, 0],
                     chord=chord_root,
-                    twist=0.0,
+                    twist=twist_root,
                     airfoil=winglet_airfoil,
                 ),
                 sbx.WingXSec(
                     xyz_le=list(location_tip),
                     chord=chord_tip,
-                    twist=0.0,
+                    twist=twist_tip,
                     airfoil=winglet_airfoil,
                 ),
             ],

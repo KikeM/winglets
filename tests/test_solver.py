@@ -66,8 +66,10 @@ def flying_wing_winglets(sections):
     SPAN = WingletParameters.SPAN.value
     ANGLE_CANT = WingletParameters.ANGLE_CANT.value
     ANGLE_SWEEP = WingletParameters.ANGLE_SWEEP.value
-    CHORD_ROOT = WingletParameters.CHORD_ROOT.value
+    ANGLE_TWIST_ROOT = WingletParameters.ANGLE_TWIST_ROOT.value
+    ANGLE_TWIST_TIP = WingletParameters.ANGLE_TWIST_TIP.value
     TAPER_RATIO = WingletParameters.TAPER_RATIO.value
+    CHORD_ROOT = WingletParameters.CHORD_ROOT.value
     W_AIRFOIL = WingletParameters.AIRFOIL.value
 
     winglet_parameters = {
@@ -76,6 +78,8 @@ def flying_wing_winglets(sections):
         CHORD_ROOT: 0.65,
         ANGLE_SWEEP: 38,
         ANGLE_CANT: 45,
+        ANGLE_TWIST_ROOT: 0.0,
+        ANGLE_TWIST_TIP: 0.0,
         W_AIRFOIL: "naca0012",
     }
 
