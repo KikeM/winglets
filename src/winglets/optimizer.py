@@ -34,7 +34,7 @@ _DESIGN_VARIABLES = [
 
 class WingletOptimizer:
 
-    MAX_ITER = 50
+    MAX_ITER = 100
 
     def __init__(
         self, base, target, operation_point, initial_winglet, interpolation_factor=0.5

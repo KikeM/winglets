@@ -89,7 +89,7 @@ def get_bounds():
 
     _max = {
         SPAN: 0.1,
-        ANGLE_CANT: 85.0,
+        ANGLE_CANT: 80.0,
         ANGLE_SWEEP: 50.0,
         ANGLE_TWIST_ROOT: 5.0,
         ANGLE_TWIST_TIP: 5.0,
